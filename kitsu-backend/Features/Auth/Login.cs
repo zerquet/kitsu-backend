@@ -39,7 +39,7 @@ public class LoginHandler
     }
     public async Task<LoginResponse> Handle(LoginRequest request, CancellationToken cancellationToken)
     {
-        var response = new LoginResponse(); //dummy password: password1
+        var response = new LoginResponse();
         var user = await _userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
