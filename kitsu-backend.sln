@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11716.220
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kitsu-backend", "kitsu-backend\kitsu-backend.csproj", "{D7359877-B249-43DC-8F66-7F229D9E8584}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kitsu-backend.Tests", "kitsu-backend.Tests\kitsu-backend.Tests.csproj", "{1C0DFECD-A71B-46FF-8827-E2DD74135B51}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D7359877-B249-43DC-8F66-7F229D9E8584}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7359877-B249-43DC-8F66-7F229D9E8584}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7359877-B249-43DC-8F66-7F229D9E8584}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7359877-B249-43DC-8F66-7F229D9E8584}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C0DFECD-A71B-46FF-8827-E2DD74135B51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C0DFECD-A71B-46FF-8827-E2DD74135B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C0DFECD-A71B-46FF-8827-E2DD74135B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C0DFECD-A71B-46FF-8827-E2DD74135B51}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C40425E9-837B-4F51-90DD-2BD79BC960A6}
+	EndGlobalSection
+EndGlobal
