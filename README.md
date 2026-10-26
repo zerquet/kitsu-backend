@@ -2,7 +2,7 @@
 
 REST API for an anime tracker based on [Kitsu](https://kitsu.app). Users can browse anime, build a personal library with watch progress and ratings, add favorites, and post reactions. Admins manage the anime catalog.
 
-Frontend: https://github.com/zerquet/kitsu-frontend/actions · Live demo: https://icy-sky-0b3ce1210.6.azurestaticapps.net/explore
+Frontend: https://github.com/zerquet/kitsu-frontend · Live demo: https://icy-sky-0b3ce1210.6.azurestaticapps.net/explore
 
 ## Tech stack
 
@@ -123,8 +123,6 @@ Production secrets are set as Azure App Service settings, not files:
 
 ## Roadmap
 
-- Automated tests (unit tests for library rules, integration tests for auth)
-- CI with GitHub Actions
 - Request validation and a global ProblemDetails error handler
 - Pagination on list endpoints
 - Rate limiting on auth endpoints
