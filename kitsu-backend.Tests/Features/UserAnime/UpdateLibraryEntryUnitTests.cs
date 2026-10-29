@@ -20,6 +20,24 @@ namespace kitsu_backend.Tests.Features.UserAnime
         }
 
         [Theory]
+        [InlineData(1, 3, 1)] // Valid case: lowest rating
+        [InlineData(4, 2, 4)] // Valid case: highest rating
+        [InlineData(null, 3, null)] // null removes the rating
+        [InlineData(0, 3, null)] // 0 also removes the rating
+        [InlineData(null, null, null)] // removing when there is no rating
+        [InlineData(5, 3, 3)] // Invalid case: above range. Stick with current rating
+        [InlineData(-1, 3, 3)] // Invalid case: below range. Stick with current rating
+        [InlineData(10, null, null)] // Invalid case: above range with no current rating
+        // requested, current, expected
+        public void GetValidUserRating_ShouldReturnValidUserRating(int? requested, int? current, int? expected)
+        {
+            //Act
+            var result = UpdateLibraryEntryHandler.GetValidUserRating(requested, current);
+            //Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
         [InlineData("watching", 12, 12, "completed")] // finished progress implies completed
         [InlineData("completed", 12, 12, "completed")]
         [InlineData("watching", 5, 12, "watching")] // partial progress implies watching

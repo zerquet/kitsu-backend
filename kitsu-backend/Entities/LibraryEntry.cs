@@ -15,7 +15,7 @@ namespace kitsu_backend.Entities
         public ApplicationUser ApplicationUser { get; set; } = null!;
         public Anime Anime { get; set; } = null!;
         public string? WatchStatus { get; set; }
-        public int? UserRating { get; set; } //null = no rating. 1-10 regular ratings. 0 not used. 
+        public int? UserRating { get; set; } //null = no rating. 1-4 = awful, bad, good, great. 0 not stored.
         public int EpisodesWatched { get; set; }
         public MediaReaction? MediaReaction { get; set; }
     }
