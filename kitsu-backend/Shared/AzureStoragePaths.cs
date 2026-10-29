@@ -1,6 +1,6 @@
 ﻿namespace kitsu_backend.Shared
 {
-    public static class MediaTypes
+    public static class AzureStoragePaths
     {
         public const string AnimePoster  = "anime/poster";
         public const string AnimeCover  = "anime/cover";

@@ -41,25 +41,23 @@ public class UpdateProfileHandler
         if (request.ProfilePhoto != null)
         {
             var oldProfileId = user.ProfilePhotoId;
-            var profileId = Guid.NewGuid().ToString();
-            await FileServerService.PostAnimeImage(profileId, request.ProfilePhoto, MediaTypes.UserProfile);
+            var profileId = await AzureStorageService.PostImage(request.ProfilePhoto, AzureStoragePaths.UserProfile);
             user.ProfilePhotoId = profileId;
 
             if (!string.IsNullOrEmpty(oldProfileId))
             {
-                await FileServerService.DeleteImage(oldProfileId, MediaTypes.UserProfile);
+                await AzureStorageService.DeleteImage(oldProfileId, AzureStoragePaths.UserProfile);
             }
         }
         if (request.CoverPhoto != null)
         {
             var oldCoverId = user.CoverPhotoId;
-            var coverId = Guid.NewGuid().ToString();
-            await FileServerService.PostAnimeImage(coverId, request.CoverPhoto, MediaTypes.UserCover);
+            var coverId = await AzureStorageService.PostImage(request.CoverPhoto, AzureStoragePaths.UserCover);
             user.CoverPhotoId = coverId;
 
             if (!string.IsNullOrEmpty(oldCoverId))
             {
-                await FileServerService.DeleteImage(oldCoverId, MediaTypes.UserCover);
+                await AzureStorageService.DeleteImage(oldCoverId, AzureStoragePaths.UserCover);
             }
         }
 

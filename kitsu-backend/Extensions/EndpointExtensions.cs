@@ -1,7 +1,9 @@
-﻿using kitsu.Features.Animes;
+﻿using kitsu.Features.Admin;
+using kitsu.Features.Animes;
 using kitsu.Features.Franchises;
 using kitsu.Features.MediaReactions;
 using kitsu.Features.Users;
+using kitsu_backend.Features.Admin;
 using kitsu_backend.Features.Animes;
 using kitsu_backend.Features.Authentication;
 using kitsu_backend.Features.Categories;
@@ -16,14 +18,18 @@ namespace kitsu_backend.Extensions
         /*Add Minimal API routes*/
         public static void AddEndpoints(WebApplication app)
         {
+            //Admin
             CreateAnimeEndpoint.Map(app);
-            GetAnimeByIdEndpoint.Map(app);
+            UpdateAnimeEndpoint.Map (app);
+            Features.Admin.GetAnimeByIdEndpoint.Map(app);
+            GetAnimeEndpoint.Map(app);
+
+
+            Features.Animes.GetAnimeByIdEndpoint.Map(app);
             GetAnimeEpisodesEndpoint.Map(app);
-            GetTopAnimeEndpoint.Map(app);
             GetAnimesByCategoryEndpoint.Map(app);
             GetAnimeByTitleEndpoint.Map(app);
             SearchAnimeEndpoint.Map(app);
-            UpdateAnimeEndpoint.Map (app);
             GetExploreAnimeEndpoint.Map(app);
             GetAnimesByCollectionEndpoint.Map(app);
 

@@ -73,7 +73,7 @@ else
         options.UseSqlServer(builder.Configuration.GetConnectionString("azureProdDb")));
 }
 
-FileServerService.Initialize(builder.Configuration);
+AzureStorageService.Initialize(builder.Configuration, builder.Environment);
 
 
 builder.Services.AddScoped<ITokenService, TokenService>();
