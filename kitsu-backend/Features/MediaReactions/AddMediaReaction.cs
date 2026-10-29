@@ -76,7 +76,7 @@ public class AddMediaReactionHandler
                                     Title = a.Title,
                                     Year = a.Year,
                                     MediaType = a.MediaType,
-                                    ImageUrl = $"{a.ImageUrl}.jpg",
+                                    ImageUrl = a.ImageUrl,
                                  },
                                  LibraryEntryId = r.LibraryEntryId,
                              }).SingleOrDefaultAsync(cancellationToken);

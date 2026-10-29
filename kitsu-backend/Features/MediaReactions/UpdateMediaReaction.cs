@@ -55,7 +55,7 @@ public class UpdateMediaReactionHandler
                 Title = reaction.Anime.Title,
                 Year = reaction.Anime.Year,
                 MediaType = reaction.Anime.MediaType,
-                ImageUrl = $"{reaction.Anime.ImageUrl}.jpg",
+                ImageUrl = reaction.Anime.ImageUrl,
             }
         };
     }

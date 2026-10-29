@@ -20,7 +20,7 @@ namespace kitsu_backend.Features.UserAnime;
 /// <param name="Email"></param>
 public record UpdateLibraryEntryRequest(int LibraryEntryId, int AnimeId, int? UserRating, string WatchStatus, int EpisodesWatched, string Email)
 {
-    public UpdateLibraryEntryRequest() : this(0, 0, 0, "", 0, "")
+    public UpdateLibraryEntryRequest() : this(0, 0, null, "", 0, "")
     {
     }
 }
@@ -59,7 +59,7 @@ public class UpdateLibraryEntryHandler
 
         libraryEntry.WatchStatus = validWatchStatus;
         libraryEntry.EpisodesWatched = validEpisodesWatched;
-        libraryEntry.UserRating = request.UserRating;
+        libraryEntry.UserRating = GetValidUserRating(request.UserRating, libraryEntry.UserRating);
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -102,6 +102,16 @@ public class UpdateLibraryEntryHandler
         if (episodesWatched >= 0 && episodesWatched <= animeEpisodeCount) 
             return episodesWatched;
         return currentEpisodesWatched;
+    }
+
+    internal static int? GetValidUserRating(int? userRating, int? currentUserRating)
+    {
+        // null or 0 removes the rating
+        if (userRating == null || userRating == 0)
+            return null;
+        if (userRating >= Constants.MinUserRating && userRating <= Constants.MaxUserRating)
+            return userRating;
+        return currentUserRating;
     }
 
     internal static string GetValidWatchStatus(string watchStatus, int episodeProgress, int animeEpisodeCount)
