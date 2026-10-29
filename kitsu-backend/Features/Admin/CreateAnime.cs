@@ -1,10 +1,12 @@
 ﻿using kitsu_backend.Database;
 using kitsu_backend.Entities;
+using kitsu_backend.Features.Admin;
 using kitsu_backend.Shared;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace kitsu_backend.Features.Animes;
+namespace kitsu.Features.Admin;
 
 /// <summary>
 /// Admin only. Creates an anime record to be saved to the database.
@@ -15,7 +17,7 @@ public class CreateAnimeRequest
     public string? Description { get; set; }
     public int? Score { get; set; }
     public List<int> Categories { get; set; } = [];
-    public string? Status { get; set; }
+    public string? ReleaseStatus { get; set; }
     public IFormFile? Image { get; set; }
     public int? Year { get; set; }
     public IFormFile? CoverImage { get; set; }
@@ -31,32 +33,32 @@ public class CreateAnimeRequest
     public int? EpisodeLength { get; set; }
     public int? FranchiseId { get; set; }
 }
+
+public class CreateAnimeResponse : AnimeTableResponseItem;
 public class CreateAnimeHandler
 {
     private readonly ApplicationDbContext _context;
 
     public CreateAnimeHandler(ApplicationDbContext context) => _context = context;
 
-    public async Task<Anime> Handle(CreateAnimeRequest request, CancellationToken cancellationToken)
+    public async Task<CreateAnimeResponse?> Handle(CreateAnimeRequest request, CancellationToken cancellationToken)
     {
         var imageId = null as string;
         var coverImageId = null as string;
         if (request.Image != null)
         {
-            imageId = Guid.NewGuid().ToString();
-            await FileServerService.PostAnimeImage(imageId, request.Image, MediaTypes.AnimePoster);
+            imageId = await AzureStorageService.PostImage(request.Image, AzureStoragePaths.AnimePoster);
         }
         if (request.CoverImage != null)
         {
-            coverImageId = Guid.NewGuid().ToString();
-            await FileServerService.PostAnimeImage(coverImageId, request.CoverImage, MediaTypes.AnimeCover);
+            coverImageId = await AzureStorageService.PostImage(request.CoverImage, AzureStoragePaths.AnimeCover);
         }
         var anime = new Anime
         {
             Title = request.Title,
             Description = request.Description,
             Score = request.Score,
-            ReleaseStatus = request.Status,
+            ReleaseStatus = request.ReleaseStatus,
             ImageUrl = imageId,
             Year = request.Year,
             EpisodeCount = request.EpisodeCount,
@@ -93,12 +95,18 @@ public class CreateAnimeHandler
         await _context.SaveChangesAsync(cancellationToken);
 
         var created = await _context.Animes.Where(a => a.Id == anime.Id)
-            .Include(a => a.Categories)
-            .Include(a => a.Franchise)
+            .Select(a => new CreateAnimeResponse
+            {
+                Id = a.Id,
+                Title = a.Title,
+                ReleaseStatus = a.ReleaseStatus,
+                EpisodeCount = a.EpisodeCount,
+                ImageUrl = a.ImageUrl,
+                MediaType = a.MediaType,
+                Year = a.Year,
+                Score = a.Score
+            })
             .SingleOrDefaultAsync(cancellationToken: cancellationToken);
-
-        created.ImageUrl += ".jpg";
-        created.CoverImageId += ".jpg";
 
         return created;
     }
@@ -109,8 +117,8 @@ public static class CreateAnimeEndpoint
 {
     public static void Map(this IEndpointRouteBuilder app)
     {
-        app.MapPost("/api/animes", [Authorize(Roles = "Admin")] async (
-            CreateAnimeRequest request, 
+        app.MapPost("/api/admin/animes", [Authorize(Roles = "Admin")] async (
+            [FromForm] CreateAnimeRequest request,
             CreateAnimeHandler handler,
             CancellationToken ct) =>
         {
@@ -118,7 +126,9 @@ public static class CreateAnimeEndpoint
 
             var result = await handler.Handle(request, ct);
 
-            return Results.Created(result.Id.ToString(), result);
+            return result == null
+                ? Results.NotFound()
+                : Results.Ok(result);
         }).DisableAntiforgery();
     }
 }

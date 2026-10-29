@@ -1,7 +1,9 @@
-﻿using kitsu.Features.Animes;
+﻿using kitsu.Features.Admin;
+using kitsu.Features.Animes;
 using kitsu.Features.Franchises;
 using kitsu.Features.MediaReactions;
 using kitsu.Features.Users;
+using kitsu_backend.Features.Admin;
 using kitsu_backend.Features.Animes;
 using kitsu_backend.Features.Authentication;
 using kitsu_backend.Features.Categories;
@@ -16,15 +18,18 @@ namespace kitsu.Extensions
         /*Add handlers (services)*/
         public static void AddHandlers(this IServiceCollection services)
         {
-            //anime feature
+            //admin feature
             services.AddScoped<CreateAnimeHandler>();
-            services.AddScoped<GetAnimeByIdHandler>();
+            services.AddScoped<UpdateAnimeHandler>();
+            services.AddScoped<GetAnimeHandler>();
+            services.AddScoped<kitsu_backend.Features.Admin.GetAnimeByIdHandler>();
+
+            //anime feature
+            services.AddScoped<kitsu_backend.Features.Animes.GetAnimeByIdHandler>();
             services.AddScoped<GetAnimeEpisodesHandler>();
-            services.AddScoped<GetTopAnimeHandler>();
             services.AddScoped<GetAnimesByCategoryHandler>();
             services.AddScoped<GetAnimeByTitleHandler>();
             services.AddScoped<SearchAnimeHandler>();
-            services.AddScoped<UpdateAnimeHandler>();
             services.AddScoped<GetExploreAnimeHandler>();
             services.AddScoped<GetAnimesByCollectionHandler>();
 

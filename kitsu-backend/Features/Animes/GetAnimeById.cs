@@ -14,7 +14,7 @@ namespace kitsu_backend.Features.Animes;
 public record GetAnimeByIdRequest(int Id, string? Email);
 public class GetAnimeByIdResponse
 {
-    public Anime Anime { get; set; } = null!;
+    public Anime Anime { get; set; } = null!; //Do not return entity, instead return DTO.
     public bool IsFavorite { get; set; }
 }
 public class GetAnimeByIdHandler
