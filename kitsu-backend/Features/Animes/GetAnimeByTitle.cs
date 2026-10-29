@@ -22,7 +22,7 @@ public class GetAnimeByTitleHandler
 
         var animes = await _context.Animes
                 .AsNoTracking()
-                .Where(a => a.Title.Contains(request.term))
+                .Where(a => a.Title.Contains(request.term) || (a.EnglishTitle != null && a.EnglishTitle.Contains(request.term)))
                 .Take(4)
                 .Select(a => new AnimeBriefResponse(a.Id, a.Title, a.ImageUrl, a.MediaType))
                 .ToListAsync(cancellationToken: cancellationToken);
