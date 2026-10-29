@@ -70,7 +70,13 @@ if(builder.Environment.IsDevelopment())
 else
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("azureProdDb")));
+        // Azure SQL serverless pauses when idle; retry so the first request waits for it to resume instead of returning a 500
+        options.UseSqlServer(
+            builder.Configuration.GetConnectionString("azureProdDb"),
+            sql => sql.EnableRetryOnFailure(
+                maxRetryCount: 8,
+                maxRetryDelay: TimeSpan.FromSeconds(15),
+                errorNumbersToAdd: null)));
 }
 
 AzureStorageService.Initialize(builder.Configuration, builder.Environment);
