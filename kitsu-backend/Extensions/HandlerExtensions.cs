@@ -9,6 +9,7 @@ using kitsu_backend.Features.Authentication;
 using kitsu_backend.Features.Categories;
 using kitsu_backend.Features.Episodes;
 using kitsu_backend.Features.Franchises;
+using kitsu_backend.Features.MediaReactions;
 using kitsu_backend.Features.UserAnime;
 
 namespace kitsu.Extensions
@@ -63,11 +64,14 @@ namespace kitsu.Extensions
             services.AddScoped<UpdateFavoriteAnimesHandler>();
             services.AddScoped<UpdateLibraryEntryHandler>();
             services.AddScoped<UpdateProfileHandler>();
+
+            //media reaction feature
             services.AddScoped<GetMediaReactionsByUserHandler>();
             services.AddScoped<GetMediaReactionByIdHandler>();
             services.AddScoped<AddMediaReactionHandler>();
             services.AddScoped<UpdateMediaReactionHandler>();
             services.AddScoped<DeleteMediaReactionHandler>();
+            services.AddScoped<GetMediaReactionsByAnimeHandler>();
         }
     }
 }

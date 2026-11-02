@@ -36,20 +36,27 @@ public class GetAnimeByIdHandler
                 Title = a.Title,
                 Description = a.Description,
                 Score = a.Score,
-                ReleaseStatus = a.ReleaseStatus,
                 ImageUrl = a.ImageUrl,
+                Year = a.Year,
+                MediaType = a.MediaType,
+                ReleaseStatus = a.ReleaseStatus,
                 CoverImageId = a.CoverImageId,
+                EpisodeCount = a.EpisodeCount,
+                EnglishTitle = a.EnglishTitle,
+                JapaneseTitle = a.JapaneseTitle,
+                JapaneseTitleRomaji = a.JapaneseTitleRomaji,
+                Season = a.Season,
+                StartAirDate = a.StartAirDate,
+                EndAirDate = a.EndAirDate,
+                TvRating = a.TvRating,
+                EpisodeLength = a.EpisodeLength,
                 FranchiseId = a.FranchiseId,
                 Franchise = a.Franchise,
-                EpisodeCount = a.EpisodeCount,
-                Year = a.Year,
-                TvRating = a.TvRating,
-                MediaType = a.MediaType,
                 Categories = a.Categories.Select(c => new Category
                 {
                     Id = c.Id,
                     Name = c.Name,
-                    Description = c.Description
+                    Slug = c.Slug
                 }).ToList(),
                 
             })
