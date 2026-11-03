@@ -14,7 +14,7 @@ public class AddMediaReactionRequest(int animeId, int libraryEntryId, string rea
 {
     public int AnimeId { get; set; } = animeId;
     public int LibraryEntryId { get; set; } = libraryEntryId;
-    public string? Email { get; set; }
+    public string Email { get; set; } = string.Empty;
     [StringLength(maximumLength: 140)]
     public string Reaction { get; set; } = reaction;
 }
@@ -37,6 +37,15 @@ public class AddMediaReactionHandler
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user == null)
+            return null;
+
+        //prevent users from adding reactions for someone else. Library entry must exist, belong to the current user, and be for the requested anime
+        var ownsLibraryEntry = await _context.LibraryEntries
+            .AnyAsync(le => le.Id == request.LibraryEntryId
+                && le.ApplicationUserId == user.Id
+                && le.AnimeId == request.AnimeId, cancellationToken);
+
+        if (!ownsLibraryEntry)
             return null;
 
         var exists = await _context.MediaReactions

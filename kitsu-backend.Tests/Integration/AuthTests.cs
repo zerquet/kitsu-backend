@@ -30,9 +30,11 @@ namespace kitsu_backend.Tests.Integration
         public async Task CreateAnime_UnauthenticatedUser_ShouldReturnUnauthorized()
         {
             // Arrange
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/animes")
+            var content = new MultipartFormDataContent();
+            content.Add(new StringContent("Test Anime"), "title");
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/admin/animes")
             {
-                Content = new StringContent("{\"title\":\"Test Anime\"}", System.Text.Encoding.UTF8, "application/json")
+                Content = content
             };
 
             // Act
@@ -48,9 +50,9 @@ namespace kitsu_backend.Tests.Integration
             // Arrange
             var user = await _client.RegisterUserAsync();
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/animes")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/admin/animes")
             {
-                Content = new StringContent("{\"title\":\"Test Anime\"}", System.Text.Encoding.UTF8, "application/json")
+                Content = new MultipartFormDataContent { { new StringContent("Test Anime"), "title" } }
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", user.Token);
 
@@ -62,7 +64,7 @@ namespace kitsu_backend.Tests.Integration
         }
 
         [Fact]
-        public async Task CreateAnime_AdminUser_ShouldReturnCreated()
+        public async Task CreateAnime_AdminUser_ShouldReturnOk()
         {
             // Arrange
             // Create new user, then assign them the "Admin" role, and login to get updated token
@@ -77,15 +79,31 @@ namespace kitsu_backend.Tests.Integration
             }
             var adminUserToken = await _client.GetAuthTokenAsync(nonAdminUser.Email);
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/animes")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/admin/animes")
             {
-                Content = new StringContent("{\"title\":\"Test Anime\", \"categories\":[]}", System.Text.Encoding.UTF8, "application/json")
+                Content = new MultipartFormDataContent { { new StringContent("Test Anime"), "title" } }
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", adminUserToken);
             // Act
             var response = await _client.SendAsync(request);
             // Assert
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task SyncCategoriesFromKitsu_AuthenticatedNonAdminUser_ShouldReturnForbidden()
+        {
+            // Arrange
+            var user = await _client.RegisterUserAsync();
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/admin/categories/sync-from-kitsu");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", user.Token);
+
+            // Act
+            var response = await _client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         [Fact]
@@ -123,6 +141,34 @@ namespace kitsu_backend.Tests.Integration
 
             // Assert - The deletion should fail with NotFound status
             Assert.Equal(HttpStatusCode.NotFound, deleteResponseAnotherUser.StatusCode);
+        }
+
+        [Fact]
+        public async Task AddMediaReaction_CannotAddReactionToAnotherUsersLibraryEntry()
+        {
+            // Arrange - Create a library entry owned by the first user
+            var owner = await _client.RegisterUserAsync();
+            var libraryEntryRequest = new HttpRequestMessage(HttpMethod.Post, "/api/library")
+            {
+                Content = new StringContent("{\"animeId\":2,\"watchStatus\":\"Watching\",\"episodesWatched\":10}", System.Text.Encoding.UTF8, "application/json")
+            };
+            libraryEntryRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", owner.Token);
+            var libraryEntryResponse = await _client.SendAsync(libraryEntryRequest);
+            libraryEntryResponse.EnsureSuccessStatusCode();
+            var libraryEntry = await libraryEntryResponse.Content.ReadFromJsonAsync<GetLibraryResponse>();
+            Assert.NotNull(libraryEntry);
+
+            // Act - Attempt to add a reaction to that library entry as a different user
+            var anotherUser = await _client.RegisterUserAsync();
+            var createReactionRequest = new HttpRequestMessage(HttpMethod.Post, "/api/mediaReactions")
+            {
+                Content = new StringContent($"{{\"animeId\":2,\"libraryEntryId\":{libraryEntry.LibraryEntryId},\"reaction\":\"Not my entry\"}}", System.Text.Encoding.UTF8, "application/json")
+            };
+            createReactionRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", anotherUser.Token);
+            var createReactionResponse = await _client.SendAsync(createReactionRequest);
+
+            // Assert - The creation should fail with BadRequest status
+            Assert.Equal(HttpStatusCode.BadRequest, createReactionResponse.StatusCode);
         }
     }
 }
