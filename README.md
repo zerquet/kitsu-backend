@@ -19,13 +19,15 @@ The code is structured as vertical slices. Each feature lives in one file under 
 
 ```
 Database/     ApplicationDbContext
-Entities/     EF Core entities (Anime, Category, Franchise, Episode, LibraryEntry, FavoriteAnime, MediaReaction, ApplicationUser)
-Features/     One file per use case, grouped by area (Animes, Auth, Categories, Episodes, Franchises, MediaReactions, UserAnime, Users)
+Entities/     EF Core entities (Anime, AnimeCategory, Category, Franchise, Episode, LibraryEntry, FavoriteAnime, MediaReaction, ApplicationUser)
+Features/     One file per use case, grouped by area (Admin, Animes, Auth, Categories, Episodes, Franchises, MediaReactions, UserAnime, Users)
 Extensions/   Endpoint, handler and identity registration
-Services/     JWT token creation
+Services/     JWT token creation, Kitsu API client
 Shared/       DTOs, constants, blob storage helper
 Migrations/   EF Core migrations
 ```
+
+Tests live in `kitsu-backend.Tests/`: unit tests for handler logic and integration tests that run the API against in-memory SQLite.
 
 ## Authorization model
 
@@ -33,7 +35,7 @@ Migrations/   EF Core migrations
 | --- | --- | --- |
 | Public | Anyone | Browse/search anime, categories, franchises, view any user's profile, library, favorites and reactions |
 | Authenticated | Any logged-in user | Edit own library, favorites, reactions and profile |
-| Admin | Users in the `Admin` role | Create/update anime, create episodes and franchises |
+| Admin | Users in the `Admin` role | Search, create and update anime, create episodes and franchises, sync anime categories from Kitsu |
 
 - The user identity for write operations always comes from the JWT, never from the request body, so users can only modify their own data.
 - Registration always assigns the `User` role. The `Admin` role can only be granted directly in the database.
@@ -45,14 +47,17 @@ Migrations/   EF Core migrations
 | --- | --- | --- |
 | POST | `/api/auth/register` | - |
 | POST | `/api/auth/login` | - |
-| GET | `/api/animes` (top anime) | - |
+| GET | `/api/animes/explore` (highest rated, new and popular) | - |
+| GET | `/api/animes/explore/{collection}` (`highest-rated`, `new`, `most-popular`) | - |
 | GET | `/api/animes/{id}` | - |
 | GET | `/api/animes/search` | - |
 | GET | `/api/animes/byTitle` | - |
 | GET | `/api/{category}/animes` | - |
 | GET | `/api/anime/{animeId}/episodes` | - |
-| POST | `/api/animes` | Admin |
-| PUT | `/api/animes` | Admin |
+| GET | `/api/animes/{animeId}/media-reactions` | - |
+| GET | `/api/admin/animes/search`, `/api/admin/animes/{id}` | Admin |
+| POST / PUT | `/api/admin/animes` | Admin |
+| POST | `/api/admin/categories/sync-from-kitsu` | Admin |
 | GET | `/api/categories`, `/api/categories/{title}` | - |
 | GET | `/api/episodes` | - |
 | POST | `/api/episodes` | Admin |
@@ -76,7 +81,10 @@ Full request and response shapes are in Swagger at `/swagger`.
 ## Notable behavior
 
 - Library updates are validated server-side: episode progress is clamped to the anime's episode count, and the watch status is corrected to match progress (for example, finishing every episode sets `completed`).
+- User ratings must be between 1 and 4. An out-of-range rating is ignored and the previous rating is kept.
 - Media reactions are returned with the user's library payload.
+- The explore endpoints take an optional `category` query parameter (a category slug) to filter results.
+- The Kitsu category sync links local anime to categories using Kitsu's own tags, matched by `KitsuId` and category slug. It only adds missing links, so it is safe to re-run. Pass `?dryRun=true` to see what would change without saving.
 
 ## Running locally
 
@@ -110,6 +118,12 @@ Prerequisites: .NET 8 SDK and a SQL Server instance (LocalDB, Express or Docker)
 To make a local admin, insert a row in `AspNetUserRoles` linking your user to the `Admin` role in `AspNetRoles`.
 
 The CORS policy allows the frontend on `localhost:4200` and `localhost:5173`. Use the HTTPS profile.
+
+To run the tests, from the repo root:
+
+```bash
+dotnet test
+```
 
 ## Production configuration
 

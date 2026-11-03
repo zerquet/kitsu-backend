@@ -1,5 +1,6 @@
 ﻿using kitsu_backend.Database;
 using kitsu_backend.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -56,7 +57,7 @@ public static class SearchAnimeEndpoint
 {
     public static void Map(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/admin/animes/search", async (
+        app.MapGet("/api/admin/animes/search", [Authorize(Roles = "Admin")] async (
             [FromQuery] string? term, 
             SearchAnimeHandler handler, 
             CancellationToken ct) =>
