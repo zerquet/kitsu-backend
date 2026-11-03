@@ -24,6 +24,7 @@ namespace kitsu_backend.Extensions
             UpdateAnimeEndpoint.Map (app);
             Features.Admin.GetAnimeByIdEndpoint.Map(app);
             GetAnimeEndpoint.Map(app);
+            SyncCategoriesFromKitsuEndpoint.Map(app);
 
 
             Features.Animes.GetAnimeByIdEndpoint.Map(app);

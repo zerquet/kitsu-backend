@@ -24,6 +24,7 @@ namespace kitsu.Extensions
             services.AddScoped<UpdateAnimeHandler>();
             services.AddScoped<GetAnimeHandler>();
             services.AddScoped<kitsu_backend.Features.Admin.GetAnimeByIdHandler>();
+            services.AddScoped<SyncCategoriesFromKitsuHandler>();
 
             //anime feature
             services.AddScoped<kitsu_backend.Features.Animes.GetAnimeByIdHandler>();

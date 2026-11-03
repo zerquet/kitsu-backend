@@ -84,6 +84,13 @@ AzureStorageService.Initialize(builder.Configuration, builder.Environment);
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 
+builder.Services.AddHttpClient<IKitsuApiClient, KitsuApiClient>(client =>
+{
+    client.BaseAddress = new Uri(KitsuApiClient.BaseUrl);
+    client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.api+json");
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("kitsu-backend");
+});
+
 HandlerExtensions.AddHandlers(builder.Services);
 
 builder.Services.AddIdentityServices(builder.Configuration);

@@ -91,6 +91,22 @@ namespace kitsu_backend.Tests.Integration
         }
 
         [Fact]
+        public async Task SyncCategoriesFromKitsu_AuthenticatedNonAdminUser_ShouldReturnForbidden()
+        {
+            // Arrange
+            var user = await _client.RegisterUserAsync();
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/admin/categories/sync-from-kitsu");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", user.Token);
+
+            // Act
+            var response = await _client.SendAsync(request);
+
+            // Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
         public async Task DeleteMediaReaction_OnlyAuthorizedUserCanDeleteReaction()
         {
             // Arrange
