@@ -22,7 +22,7 @@ namespace kitsu.Extensions
             //admin feature
             services.AddScoped<CreateAnimeHandler>();
             services.AddScoped<UpdateAnimeHandler>();
-            services.AddScoped<GetAnimeHandler>();
+            services.AddScoped<kitsu_backend.Features.Admin.SearchAnimeHandler>();
             services.AddScoped<kitsu_backend.Features.Admin.GetAnimeByIdHandler>();
             services.AddScoped<SyncCategoriesFromKitsuHandler>();
 
@@ -31,7 +31,7 @@ namespace kitsu.Extensions
             services.AddScoped<GetAnimeEpisodesHandler>();
             services.AddScoped<GetAnimesByCategoryHandler>();
             services.AddScoped<GetAnimeByTitleHandler>();
-            services.AddScoped<SearchAnimeHandler>();
+            services.AddScoped<kitsu_backend.Features.Animes.SearchAnimeHandler>();
             services.AddScoped<GetExploreAnimeHandler>();
             services.AddScoped<GetAnimesByCollectionHandler>();
 

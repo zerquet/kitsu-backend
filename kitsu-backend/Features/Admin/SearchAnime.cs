@@ -1,12 +1,13 @@
 ﻿using kitsu_backend.Database;
 using kitsu_backend.Entities;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace kitsu_backend.Features.Admin;
 /// <summary>
 /// Request to get animes for admin page.
 /// </summary>
-public record GetAnimeRequest;
+public record SearchAnimeRequest(string? Term);
 
 public class AnimeTableResponseItem
 {
@@ -19,14 +20,20 @@ public class AnimeTableResponseItem
     public int? EpisodeCount { get; set; }
     public string? MediaType { get; set; }
 }
-public class GetAnimeHandler
+public class SearchAnimeHandler
 {
     private readonly ApplicationDbContext _context;
-    public GetAnimeHandler(ApplicationDbContext context) => _context = context;
+    public SearchAnimeHandler(ApplicationDbContext context) => _context = context;
 
-    public async Task<IEnumerable<AnimeTableResponseItem>> Handle(GetAnimeRequest request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<AnimeTableResponseItem>> Handle(SearchAnimeRequest request, CancellationToken cancellationToken)
     {
-        var animes = await _context.Animes
+        IQueryable<Anime> animes = _context.Animes;
+        if (string.IsNullOrEmpty(request.Term))
+            animes = animes.Where(a => a.StartAirDate != null).OrderByDescending(a => a.StartAirDate);
+        else
+            animes = animes.Where(a => a.Title.Contains(request.Term) || (a.EnglishTitle != null && a.EnglishTitle.Contains(request.Term)));
+
+        var results = await animes
             .Select(a => new AnimeTableResponseItem
             {
                 Id = a.Id,
@@ -41,17 +48,20 @@ public class GetAnimeHandler
             .Take(30)
             .ToListAsync(cancellationToken: cancellationToken);
 
-        return animes;
+        return results;
     }
 }
 
-public static class GetAnimeEndpoint
+public static class SearchAnimeEndpoint
 {
     public static void Map(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/admin/animes", async (GetAnimeHandler handler, CancellationToken ct) =>
+        app.MapGet("/api/admin/animes/search", async (
+            [FromQuery] string? term, 
+            SearchAnimeHandler handler, 
+            CancellationToken ct) =>
         {
-            var result = await handler.Handle(new GetAnimeRequest(), ct);
+            var result = await handler.Handle(new SearchAnimeRequest(term), ct);
 
             return Results.Ok(result);
         });
