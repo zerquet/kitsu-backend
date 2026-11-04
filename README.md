@@ -4,6 +4,8 @@ REST API for an anime tracker based on [Kitsu](https://kitsu.app). Users can bro
 
 Frontend: https://github.com/zerquet/kitsu-frontend · Live demo: https://icy-sky-0b3ce1210.6.azurestaticapps.net/explore
 
+> This is an unofficial portfolio project. It is not affiliated with, endorsed by, or connected to Kitsu. Category data is read from Kitsu's public API.
+
 ## Tech stack
 
 - **.NET 8**, ASP.NET Core Minimal APIs
